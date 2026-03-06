@@ -134,9 +134,8 @@ const contentData = {
 type LangKey = keyof typeof contentData;
 
 // ==========================================
-// 2. PERFECT SEAMLESS PATTERN (Fixed SVG)
+// 2. PERFECT SEAMLESS PATTERN
 // ==========================================
-// این پترن از یک ساختار هندسی بی‌نقص و تکرارپذیر ساخته شده است که هرگز برش نمی‌خورد
 const perfectPatternLight = `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23033f63' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`;
 const perfectPatternDark = `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`;
 
@@ -166,7 +165,6 @@ const GlassCard = ({ children, className = "", onClick = undefined }: any) => {
       onMouseLeave={() => setIsHovered(false)}
       className={`relative overflow-hidden rounded-[2rem] bg-white/60 dark:bg-[#0a192f]/60 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] transition-all duration-500 ${onClick ? 'cursor-pointer hover:-translate-y-2 hover:shadow-[0_15px_40px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_15px_40px_rgba(0,0,0,0.5)]' : ''} ${className}`}
     >
-      {/* Floating Glow Effect */}
       <div
         className="absolute inset-0 pointer-events-none transition-opacity duration-300 ease-in-out"
         style={{
@@ -180,7 +178,33 @@ const GlassCard = ({ children, className = "", onClick = undefined }: any) => {
 };
 
 // ==========================================
-// 4. MAIN APP COMPONENT
+// 4. MATRIX LOADER COMPONENT
+// ==========================================
+const MatrixLoader = ({ isDarkMode }: { isDarkMode: boolean }) => {
+  return (
+    <div className="grid grid-cols-3 gap-2 w-20 h-20 z-10">
+      {[...Array(9)].map((_, i) => (
+        <div 
+          key={i} 
+          className={`w-full h-full rounded-sm ${isDarkMode ? 'bg-[#fedc97]' : 'bg-[#033f63]'}`}
+          style={{
+            animation: `matrixScale 1.5s infinite ease-in-out`,
+            animationDelay: `${(Math.floor(i / 3) + (i % 3)) * 0.15}s`
+          }}
+        ></div>
+      ))}
+      <style jsx>{`
+        @keyframes matrixScale {
+          0%, 100% { transform: scale(0.2); opacity: 0.2; }
+          50% { transform: scale(1); opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+// ==========================================
+// 5. MAIN APP COMPONENT
 // ==========================================
 export default function App() {
   const [lang, setLang] = useState<LangKey>('fa');
@@ -228,7 +252,7 @@ export default function App() {
 
   const handlePageChange = (newPageId: string) => {
     if (pageId === newPageId) return;
-    setIsMobileMenuOpen(false); // Close mobile menu on navigate
+    setIsMobileMenuOpen(false);
     setIsTransitioning(true);
     setTimeout(() => {
       setPageId(newPageId);
@@ -254,16 +278,7 @@ export default function App() {
   if (isInitialLoad) {
     return (
       <div className={`fixed inset-0 ${isDarkMode ? 'bg-[#040d17]' : 'bg-[#f4f6f8]'} flex flex-col items-center justify-center z-[100] ${vazir.className}`} style={{ backgroundImage: isDarkMode ? perfectPatternDark : perfectPatternLight }}>
-        <div className="grid grid-cols-3 gap-2 w-20 h-20 z-10">
-          {[...Array(9)].map((_, i) => (
-            <div 
-              key={i} 
-              className={`w-full h-full rounded-sm ${isDarkMode ? 'bg-[#fedc97]' : 'bg-[#033f63]'}`}
-              style={{ animation: `matrixScale 1.5s infinite ease-in-out`, animationDelay: `${(Math.floor(i / 3) + (i % 3)) * 0.15}s` }}
-            ></div>
-          ))}
-          <style jsx>{`@keyframes matrixScale { 0%, 100% { transform: scale(0.2); opacity: 0.2; } 50% { transform: scale(1); opacity: 1; } }`}</style>
-        </div>
+        <MatrixLoader isDarkMode={isDarkMode} />
         <h1 className="text-2xl md:text-3xl font-black text-[#033f63] dark:text-[#fedc97] tracking-widest mt-8 animate-pulse z-10 drop-shadow-md">
           {lang === 'fa' || lang === 'ps' ? 'بهائی‌کاوی' : 'Bahai-Kavi'}
         </h1>
@@ -277,7 +292,9 @@ export default function App() {
       {/* Page Transition Overlay */}
       {isTransitioning && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#f4f6f8]/70 dark:bg-[#040d17]/70 backdrop-blur-md transition-opacity duration-300">
-           <div className="w-12 h-12 border-4 border-[#28666e]/30 dark:border-white/10 border-t-[#033f63] dark:border-t-[#fedc97] rounded-full animate-spin"></div>
+           <div className="scale-75">
+              <MatrixLoader isDarkMode={isDarkMode} />
+           </div>
         </div>
       )}
 
@@ -287,7 +304,6 @@ export default function App() {
         {/* ================= RESPONSIVE HEADER ================= */}
         <header className="flex justify-between items-center bg-white/80 dark:bg-[#0d233a]/80 backdrop-blur-2xl px-5 py-4 rounded-2xl shadow-lg dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] transition-all duration-300 sticky top-4 z-50 border border-white/50 dark:border-white/10">
           
-          {/* Logo */}
           <div 
             className="text-xl md:text-2xl font-black text-[#033f63] dark:text-[#fedc97] tracking-tight cursor-pointer flex-shrink-0 transition-colors drop-shadow-sm"
             onClick={() => handlePageChange('home')}
@@ -311,7 +327,6 @@ export default function App() {
                     {hasSub && <svg className="w-3.5 h-3.5 mt-0.5 opacity-70 group-hover:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" /></svg>}
                   </button>
                   
-                  {/* Dropdown Menu */}
                   {hasSub && (
                     <div className="absolute top-full right-1/2 translate-x-1/2 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50 w-44">
                       <div className="bg-white/90 dark:bg-[#0f172a]/95 backdrop-blur-xl rounded-xl shadow-xl dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] border border-white/50 dark:border-white/10 overflow-hidden flex flex-col p-1.5">
@@ -328,7 +343,6 @@ export default function App() {
             })}
           </nav>
           
-          {/* Actions & Mobile Toggle */}
           <div className="flex items-center gap-3 flex-shrink-0">
             <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2.5 rounded-xl bg-white/50 dark:bg-white/10 text-[#033f63] dark:text-[#fedc97] hover:bg-white dark:hover:bg-white/20 transition-all shadow-sm dark:shadow-none border border-white/40 dark:border-white/5">
               {isDarkMode ? <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" /></svg> : <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" /></svg>}
@@ -345,7 +359,6 @@ export default function App() {
               {t.ui.login}
             </button>
 
-            {/* Hamburger Icon for Mobile */}
             <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="lg:hidden p-2 text-[#033f63] dark:text-white">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}/></svg>
             </button>
@@ -420,7 +433,7 @@ export default function App() {
                 </div>
               </section>
 
-              {/* --- 2. اهداف (با استفاده از کارت شیشه‌ای تعاملی) --- */}
+              {/* --- 2. اهداف --- */}
               <section className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                 {[
                   { title: lang === 'fa' ? 'گردآوری اسناد' : 'Document Collection', desc: t.pages.articles.desc, icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
@@ -429,7 +442,7 @@ export default function App() {
                 ].map((item, i) => (
                   <GlassCard key={i} className="p-6 md:p-8 flex items-start gap-4 md:gap-6 group">
                     <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-white/50 dark:bg-white/10 text-[#28666e] dark:text-[#fedc97] flex items-center justify-center flex-shrink-0 group-hover:bg-[#28666e] dark:group-hover:bg-[#fedc97] group-hover:text-white dark:group-hover:text-[#040d17] transition-colors duration-300 shadow-sm border border-white/50 dark:border-white/5">
-                      <svg className="w-7 h-7 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d={item.icon}/></svg>
+                      <svg className="w-7 h-7 md:w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5"><path strokeLinecap="round" strokeLinejoin="round" d={item.icon}/></svg>
                     </div>
                     <div>
                       <h3 className="font-bold text-[#033f63] dark:text-white text-base md:text-lg mb-1.5 line-clamp-1">{item.title}</h3>
